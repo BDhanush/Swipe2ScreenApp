@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="8dp"
     app:cardCornerRadius="16dp">
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,11 +13,10 @@
         android:orientation="vertical">
         <ImageView
             android:layout_width="match_parent"
-            android:scaleType="centerCrop"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="#F4C2C2"
+            android:layout_height="200dp"
+            android:scaleType="fitCenter"
             android:id="@+id/img"
+            android:src="@drawable/product_placeholder_wp"
             android:contentDescription="@string/app_name" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,27 +33,30 @@
                 app:layout_constraintBottom_toBottomOf="@+id/price"
                 app:layout_constraintEnd_toStartOf="@+id/price"
                 app:layout_constraintStart_toStartOf="parent"
+                android:textSize="18dp"
                 app:layout_constraintTop_toTopOf="@+id/price"
-                android:text="Product Name" />
+                tools:text="Product Name" />
 
             <TextView
                 android:id="@+id/type"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="type"
+                tools:text="type"
+                android:layout_marginTop="5dp"
+                android:textSize="14dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?android:attr/textColorSecondary"
-                app:layout_constraintEnd_toEndOf="@+id/title"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/price" />
+                app:layout_constraintTop_toBottomOf="@id/title" />
 
 
             <TextView
                 android:id="@+id/price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceTitleLarge"
-                android:text="$ 1000"
+                android:textSize="18dp"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                tools:text="$ 1000"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
             <TextView
