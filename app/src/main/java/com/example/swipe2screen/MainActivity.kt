@@ -1,5 +1,6 @@
 package com.example.swipe2screen
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -39,9 +40,9 @@ class MainActivity : AppCompatActivity() {
         //action on addProduct button
         binding.addProduct.setOnClickListener{
             //open upload product page by opening UploadActivity
-//            Intent(this,UploadActivity::class.java).also {
-//                startActivity(it)
-//            }
+            Intent(this,UploadActivity::class.java).also {
+                startActivity(it)
+            }
         }
 
         binding.eventRecyclerView.setHasFixedSize(true)
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun filter(text:String) {
         // creating a new array list to filter our data.
+        binding.eventRecyclerView.smoothScrollToPosition(0)
         val filteredlist = mutableListOf<Product>();
 
         // running a for loop to compare elements.
