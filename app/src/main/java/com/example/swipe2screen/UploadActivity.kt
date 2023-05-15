@@ -75,16 +75,10 @@ class UploadActivity : AppCompatActivity() {
     {
         var imagePath:Uri?=null
         if(selectedImageUri!=null) {
-            val filesDir=applicationContext.filesDir
-            val file = File(filesDir,"image.png")
-            val inputStream =contentResolver.openInputStream(selectedImageUri!!)
-            val outputStream= FileOutputStream(file)
-
-            val fileUri = Uri.fromFile(file)
 
             val storageRef = storage.reference.child("/images/${System.currentTimeMillis()}")
             Toast.makeText(baseContext,selectedImageUri.toString(),Toast.LENGTH_SHORT).show()
-            val uploadTask=storageRef.putFile(fileUri)
+            val uploadTask=storageRef.putFile(selectedImageUri!!)
                 .addOnSuccessListener { taskSnapshot ->
                     //get url of uploaded video
                     Toast.makeText(baseContext,taskSnapshot.storage.downloadUrl.toString(),Toast.LENGTH_SHORT).show()
