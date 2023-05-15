@@ -4,24 +4,20 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.swipe2screen.adapter.ListingAdapter
 import com.example.swipe2screen.databinding.ActivityUploadBinding
-import com.example.swipe2screen.model.Product
+import com.google.android.gms.tasks.Task
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -30,6 +26,8 @@ import java.util.*
 
 
 class UploadActivity : AppCompatActivity() {
+    var storage = Firebase.storage
+
     private lateinit var binding: ActivityUploadBinding
     val postURL="https://app.getswipe.in/api/public/"
     private val productTypes:ArrayList<String> = arrayListOf("OS","Service","MNC","Other","pen")
@@ -64,7 +62,7 @@ class UploadActivity : AppCompatActivity() {
         }
 
         binding.upload.setOnClickListener {
-            if(CheckAllFields())
+            if(checkAllFields())
             {
                 postProductInfo()
 
@@ -73,33 +71,30 @@ class UploadActivity : AppCompatActivity() {
 
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode== Activity.RESULT_OK && requestCode==SELECT_PICTURE)
-        {
-            selectedImageUri = data!!.data
-            if(selectedImageUri!=null)
-            {
-                binding.addImage.text="Choose another image"
-                binding.addImage.icon= ContextCompat.getDrawable(this,R.drawable.baseline_add_24)
-            }else{
-                binding.addImage.text="Add Image"
-                binding.addImage.icon= ContextCompat.getDrawable(this,R.drawable.baseline_upload_24)
-            }
-
-        }
-    }
-
     private fun postProductInfo()
     {
-        val filesDir=applicationContext.filesDir
-        val file = File(filesDir,"image.png")
-        val inputStream =contentResolver.openInputStream(selectedImageUri!!)
-        val outputStream= FileOutputStream(file)
-        inputStream!!.copyTo(outputStream)
+        var imagePath:Uri?=null
+        if(selectedImageUri!=null) {
+            val filesDir=applicationContext.filesDir
+            val file = File(filesDir,"image.png")
+            val inputStream =contentResolver.openInputStream(selectedImageUri!!)
+            val outputStream= FileOutputStream(file)
 
-        val filePart = MultipartBody.Part.createFormData("file", file.name, RequestBody.create(MediaType.parse("image/*"), file))
+            val fileUri = Uri.fromFile(file)
+
+            val storageRef = storage.reference.child("/images/${System.currentTimeMillis()}")
+            Toast.makeText(baseContext,selectedImageUri.toString(),Toast.LENGTH_SHORT).show()
+            val uploadTask=storageRef.putFile(fileUri)
+                .addOnSuccessListener { taskSnapshot ->
+                    //get url of uploaded video
+                    Toast.makeText(baseContext,taskSnapshot.storage.downloadUrl.toString(),Toast.LENGTH_SHORT).show()
+
+                    val uriTask: Task<Uri> = taskSnapshot.storage.downloadUrl
+                    while(!uriTask.isSuccessful);
+                    imagePath = uriTask.result
+                }
+        }
+        val imagePart = RequestBody.create(MediaType.parse("multipart/form-data"),imagePath.toString())
         val pricePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.priceInput.text.toString())
         val taxPart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.taxRateInput.text.toString())
         val productNamePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.productNameInput.text.toString())
@@ -108,38 +103,47 @@ class UploadActivity : AppCompatActivity() {
         val retrofitBuffer= Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
             .baseUrl(dataURL).build().create(ApiInterface::class.java)
 
-//        val call:Call<ProductPost> = retrofitBuffer.postProductInfo(pricePart,productNamePart,productTypePart,taxPart,filePart)
-//
-//        call.enqueue(object : Callback<ProductPost> {
-//            override fun onResponse(call: Call<ProductPost>, response: Response<ProductPost>) {
-//                val responseBody=response.body()!!
-//                if(responseBody)
-//            }
-//
-//            override fun onFailure(call: Call<ProductPost>, t: Throwable) {
-//                return postProductInfo()
-//
-//            }
-//        })
-
         CoroutineScope(Dispatchers.IO).launch {
-            val response:ResponseBody = retrofitBuffer.postProductInfo(pricePart,productNamePart,productTypePart,taxPart,filePart)
+            val response:ResponseBody = retrofitBuffer.postProductInfo(imagePart,pricePart,productNamePart,productTypePart,taxPart)
 //            Toast.makeText(baseContext,response.toString(),Toast.LENGTH_SHORT).show()
             finish()
+            Intent(baseContext, MainActivity::class.java).also {
+                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(it)
+            }
         }
 
     }
 
     private fun chooseImage()
     {
-        val intent = Intent(Intent.ACTION_PICK)
+        val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
 
-        startActivityForResult(intent,SELECT_PICTURE);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
 
     }
-    private fun CheckAllFields(): Boolean {
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode== Activity.RESULT_OK && requestCode==SELECT_PICTURE)
+        {
+            selectedImageUri = data!!.data
+
+            if(selectedImageUri!=null)
+            {
+                binding.addImage.text="Choose another image"
+                binding.addImage.icon= ContextCompat.getDrawable(this, R.drawable.baseline_add_24)
+            }else{
+                binding.addImage.text="Add Image"
+                binding.addImage.icon= ContextCompat.getDrawable(this,R.drawable.baseline_upload_24)
+            }
+
+        }
+    }
+
+    private fun checkAllFields(): Boolean {
         var check:Boolean=true;
         if (binding.productNameInput.length() == 0) {
             binding.productNameInput.error = "This field is required"

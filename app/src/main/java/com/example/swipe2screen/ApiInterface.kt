@@ -17,10 +17,10 @@ interface ApiInterface {
     @Multipart
     @POST(value = "add")
     suspend fun postProductInfo(
+        @Part("image") image: RequestBody,
         @Part("price") price: RequestBody,
         @Part("product_name") productName: RequestBody,
         @Part("product_type") productType: RequestBody,
-        @Part("tax") tax: RequestBody,
-        @Part files: MultipartBody.Part
+        @Part("tax") tax: RequestBody
     ):ResponseBody
 }
