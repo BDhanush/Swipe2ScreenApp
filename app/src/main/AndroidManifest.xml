@@ -13,17 +13,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Swipe2Screen"
-        tools:targetApi="31">
+        tools:targetApi="33">
         <activity
             android:name=".UploadActivity"
-            android:exported="false">
+            android:exported="false"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
