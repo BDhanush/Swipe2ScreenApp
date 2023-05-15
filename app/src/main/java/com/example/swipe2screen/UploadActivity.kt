@@ -11,7 +11,7 @@ import kotlin.collections.ArrayList
 class UploadActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUploadBinding
 
-    val productTypes:ArrayList<String> = arrayListOf("OS","Operating System","Operating System1","more","less","next")
+    val productTypes:ArrayList<String> = arrayListOf("OS","Service","MNC","Other","pen")
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 binding.searchBar.clearFocus()
-                return true
+                return false
             }
 
             override fun onQueryTextChange(msg: String): Boolean {
@@ -68,13 +68,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun filter(text:String) {
         // creating a new array list to filter our data.
-        binding.eventRecyclerView.smoothScrollToPosition(0)
         val filteredlist = mutableListOf<Product>();
 
         // running a for loop to compare elements.
         for (item in dataset) {
             // checking if the entered string matched with any item of our recycler view.
-            if (item.product_name!!.lowercase().contains(text.lowercase())) {
+            val searchItem=text.lowercase()
+            if (item.product_name!!.lowercase().contains(searchItem) || item.product_type!!.lowercase().contains(searchItem)) {
                 // if the item is matched we are
                 // adding it to our filtered list.
                 filteredlist.add(item);
