@@ -16,11 +16,11 @@ interface ApiInterface {
 
     @Multipart
     @POST(value = "add")
-    suspend fun postProductInfo(
-        @Part("image") image: RequestBody,
+    fun upload(
         @Part("price") price: RequestBody,
         @Part("product_name") productName: RequestBody,
         @Part("product_type") productType: RequestBody,
-        @Part("tax") tax: RequestBody
-    ):ResponseBody
+        @Part("tax") tax: RequestBody,
+        @Part image: MultipartBody.Part?=null
+    ):Call<ResponseBody>
 }

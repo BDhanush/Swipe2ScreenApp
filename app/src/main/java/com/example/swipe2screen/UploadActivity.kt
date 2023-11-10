@@ -1,32 +1,39 @@
 package com.example.swipe2screen
 
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import com.example.swipe2screen.databinding.ActivityUploadBinding
-import com.google.android.gms.tasks.Task
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.util.*
 
 
 class UploadActivity : AppCompatActivity() {
-    var storage = Firebase.storage
 
     private lateinit var binding: ActivityUploadBinding
     val postURL="https://app.getswipe.in/api/public/"
@@ -50,12 +57,12 @@ class UploadActivity : AppCompatActivity() {
             if(hasFocus)
             {
                 binding.typeInput.showDropDown();
-            }else {
-                binding.typeInput.setOnClickListener {
-                    binding.typeInput.showDropDown();
-                }
             }
         }
+        binding.typeInput.setOnClickListener {
+            binding.typeInput.showDropDown();
+        }
+
         binding.addImage.setOnClickListener{
             chooseImage()
 
@@ -64,48 +71,73 @@ class UploadActivity : AppCompatActivity() {
         binding.upload.setOnClickListener {
             if(checkAllFields())
             {
-                postProductInfo()
+                upload()
 
             }
         }
 
     }
 
-    private fun postProductInfo()
-    {
-        var imagePath:Uri?=null
-        if(selectedImageUri!=null) {
+    private fun upload(){
 
-            val storageRef = storage.reference.child("/images/${System.currentTimeMillis()}")
-            Toast.makeText(baseContext,selectedImageUri.toString(),Toast.LENGTH_SHORT).show()
-            val uploadTask=storageRef.putFile(selectedImageUri!!)
-                .addOnSuccessListener { taskSnapshot ->
-                    //get url of uploaded video
-                    Toast.makeText(baseContext,taskSnapshot.storage.downloadUrl.toString(),Toast.LENGTH_SHORT).show()
+        val retrofitBuffer= Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(dataURL).build().create(ApiInterface::class.java)
 
-                    val uriTask: Task<Uri> = taskSnapshot.storage.downloadUrl
-                    while(!uriTask.isSuccessful);
-                    imagePath = uriTask.result
-                }
+
+        val filesDir=applicationContext.filesDir
+        val file=File(filesDir,"product_image.png")
+        val outputStream=FileOutputStream(file)
+
+        //add image via ImageView (1:1 ratio)
+        val imageDrawable=binding.imagePreview.drawable as BitmapDrawable?
+        if(imageDrawable!=null) {
+            val bitmap = imageDrawable.bitmap
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         }
-        val imagePart = RequestBody.create(MediaType.parse("multipart/form-data"),imagePath.toString())
+
+        //add Image via Uri (no crop)
+//        val inputStream= selectedImageUri?.let { contentResolver.openInputStream(it) }
+//        inputStream?.copyTo(outputStream)
+
+        val requestBody = RequestBody.create(MediaType.parse("image/*"),file)
+        val filePart:MultipartBody.Part? = if(selectedImageUri!=null)
+                MultipartBody.Part.createFormData("files[]", file.name,requestBody)
+            else
+                null
+
         val pricePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.priceInput.text.toString())
         val taxPart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.taxRateInput.text.toString())
         val productNamePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.productNameInput.text.toString())
         val productTypePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.typeInput.text.toString())
 
-        val retrofitBuffer= Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(dataURL).build().create(ApiInterface::class.java)
+        val retrofitData = retrofitBuffer.upload(pricePart,productNamePart,productTypePart,taxPart,filePart)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val response:ResponseBody = retrofitBuffer.postProductInfo(imagePart,pricePart,productNamePart,productTypePart,taxPart)
-//            Toast.makeText(baseContext,response.toString(),Toast.LENGTH_SHORT).show()
-            finish()
-            Intent(baseContext, MainActivity::class.java).also {
-                it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(it)
+
+        retrofitData.enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+//                val code=response.code()
+//                Toast.makeText(applicationContext,"$code",Toast.LENGTH_SHORT).show()
+
+                if (response.isSuccessful) {
+                    Toast.makeText(applicationContext,"Product added", Toast.LENGTH_SHORT).show()
+                    finish()
+                    Intent(baseContext, MainActivity::class.java).also {
+                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(it)
+                    }
+                } else {
+                    Log.e(TAG, "Error: ${response.code()}, ${response.message()}")
+                    Toast.makeText(applicationContext, "Error adding product", Toast.LENGTH_SHORT).show()
+                }
+                Log.e(TAG,response.toString())
+
             }
-        }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Toast.makeText(applicationContext,t.message?:"Error", Toast.LENGTH_SHORT).show()
+
+            }
+        })
 
     }
 
@@ -129,9 +161,11 @@ class UploadActivity : AppCompatActivity() {
             {
                 binding.addImage.text="Choose another image"
                 binding.addImage.icon= ContextCompat.getDrawable(this, R.drawable.baseline_add_24)
+                binding.imagePreview.setImageURI(selectedImageUri)
             }else{
                 binding.addImage.text="Add Image"
                 binding.addImage.icon= ContextCompat.getDrawable(this,R.drawable.baseline_upload_24)
+                binding.imagePreview.setImageDrawable(null)
             }
 
         }
