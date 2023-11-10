@@ -11,9 +11,7 @@ import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import com.example.swipe2screen.databinding.ActivityUploadBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +69,7 @@ class UploadActivity : AppCompatActivity() {
         binding.upload.setOnClickListener {
             if(checkAllFields())
             {
+                lockUploadButton()
                 upload()
 
             }
@@ -78,6 +77,16 @@ class UploadActivity : AppCompatActivity() {
 
     }
 
+    private fun lockUploadButton()
+    {
+        binding.upload.isEnabled=false
+        binding.upload.text="Uploading"
+    }
+    private fun unlockUploadButton()
+    {
+        binding.upload.isEnabled=true
+        binding.upload.text="Upload"
+    }
     private fun upload(){
 
         val retrofitBuffer= Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
@@ -117,7 +126,6 @@ class UploadActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
 //                val code=response.code()
 //                Toast.makeText(applicationContext,"$code",Toast.LENGTH_SHORT).show()
-
                 if (response.isSuccessful) {
                     Toast.makeText(applicationContext,"Product added", Toast.LENGTH_SHORT).show()
                     finish()
@@ -128,14 +136,16 @@ class UploadActivity : AppCompatActivity() {
                 } else {
                     Log.e(TAG, "Error: ${response.code()}, ${response.message()}")
                     Toast.makeText(applicationContext, "Error adding product", Toast.LENGTH_SHORT).show()
+                    unlockUploadButton()
                 }
+
                 Log.e(TAG,response.toString())
 
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(applicationContext,t.message?:"Error", Toast.LENGTH_SHORT).show()
-
+                unlockUploadButton()
             }
         })
 
@@ -177,19 +187,29 @@ class UploadActivity : AppCompatActivity() {
             binding.productNameInput.error = "This field is required"
             check = false
         }
-        if (binding.typeInput.length() == 0) {
+        if (binding.typeInput.text.toString().isEmpty()) {
             binding.typeInput.error = "This field is required"
             check = false
         }else if (!productTypes.contains(binding.typeInput.text.toString())){
             binding.typeInput.error = "Type doesn't exist"
             check = false
+        }else{
+            binding.typeInput.error=null
         }
-        if (binding.priceInput.text.toString().isEmpty()) {
+        if (binding.priceInput.length() == 0) {
             binding.priceInput.error = "This field is required"
             check = false
         }
-        if (binding.taxRateInput.text.toString().isEmpty()) {
+        if (binding.priceInput.text.toString()==".") {
+            binding.priceInput.error = "Enter a decimal"
+            check = false
+        }
+        if (binding.taxRateInput.length() == 0) {
             binding.taxRateInput.error = "This field is required"
+            check = false
+        }
+        if (binding.taxRateInput.text.toString()==".") {
+            binding.taxRateInput.error = "Enter a decimal"
             check = false
         }
         // after all validation return true.

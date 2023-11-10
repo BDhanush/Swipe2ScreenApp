@@ -7,22 +7,15 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import android.widget.SearchView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.swipe2screen.adapter.ListingAdapter
 import com.example.swipe2screen.databinding.ActivityMainBinding
 import com.example.swipe2screen.model.Product
-import com.google.android.material.search.SearchBar
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -62,12 +55,10 @@ class MainActivity : AppCompatActivity() {
             getProductInfo()
         }
 
-        val searchView: com.google.android.material.search.SearchView = findViewById(R.id.searchView)
-        val searchBar: SearchBar = findViewById(R.id.searchBar)
-        searchView.setupWithSearchBar(searchBar)
-        searchView.clearFocus()
+        binding.searchView.setupWithSearchBar(binding.searchBar)
+        binding.searchView.clearFocus()
 
-        searchView.editText.addTextChangedListener(object : TextWatcher {
+        binding.searchView.editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
             }
@@ -85,9 +76,9 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        searchView.editText.setOnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
-            searchBar.text = searchView.text
-            searchView.hide()
+        binding.searchView.editText.setOnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
+            binding.searchBar.text = binding.searchView.text
+            binding.searchView.hide()
             false
         }
 
