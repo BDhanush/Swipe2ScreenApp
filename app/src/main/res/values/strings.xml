@@ -14,5 +14,6 @@
     <string name="type_representation">Type: %s</string>
     <string name="image_button_selected">Choose another image</string>
     <string name="image_button_default">Add Image</string>
+    <string name="price_representation">%s + %s%% tax</string>
 
 </resources>

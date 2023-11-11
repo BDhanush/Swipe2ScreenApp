@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="READ_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -12,23 +11,27 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Swipe2Screen"
-        android:requestLegacyExternalStorage="true"
         tools:targetApi="34">
         <activity
+            android:name=".DetailsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:exported="false" />
+        <activity
             android:name=".UploadActivity"
-            android:exported="false"
-            android:configChanges="keyboardHidden|orientation|screenSize|uiMode">
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:configChanges="keyboardHidden|orientation|screenSize|uiMode">
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
