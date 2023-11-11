@@ -19,7 +19,8 @@
             android:layout_height="180dp"
             android:scaleType="centerCrop"
             android:id="@+id/img"
-            android:src="@drawable/product_placeholder_wp" />
+            android:src="@drawable/product_placeholder_wp"
+            android:contentDescription="Product Image" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -32,7 +33,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Product Name" />
@@ -44,7 +45,7 @@
                 android:layout_marginTop="5dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title"
                 tools:text="type" />
@@ -55,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 app:layout_constraintBottom_toTopOf="@+id/withTax"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="$ 1000" />
@@ -64,7 +65,7 @@
                 android:id="@+id/withTax"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="with tax"
+                android:text="@string/with_tax"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 

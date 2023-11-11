@@ -20,12 +20,12 @@ import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-val dataURL="https://app.getswipe.in/api/public/"                 //api link
+const val dataURL="https://app.getswipe.in/api/public/"                 //api link
 
 class MainActivity : AppCompatActivity() {
     lateinit var adapter: ListingAdapter
     lateinit var linearLayoutManager: LinearLayoutManager
-    var dataset=mutableListOf<Product>()
+    var dataset=mutableListOf<Product>()                                //dataset of products
 
     private lateinit var binding: ActivityMainBinding
 
@@ -37,8 +37,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.progressBar.show()
-        //action on addProduct button
+        binding.progressBar.show()              //loading indicator (progress bar)
+
+        //open upload activity when clicked on addProduct button (bottom right hand corner)
         binding.addProduct.setOnClickListener{
             //open upload product page by opening UploadActivity
             Intent(this,UploadActivity::class.java).also {
@@ -46,10 +47,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //initialize Products RecyclerView
         binding.recyclerView.setHasFixedSize(true)
         linearLayoutManager= LinearLayoutManager(this)
         binding.recyclerView.layoutManager=linearLayoutManager
-        getProductInfo()
+        getProductInfo()        //make get call and load products
+        //actions pull down refresh
         binding.swipeRefreshLayout.setOnRefreshListener{
             binding.swipeRefreshLayout.isRefreshing = false
             getProductInfo()
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         binding.searchView.setupWithSearchBar(binding.searchBar)
         binding.searchView.clearFocus()
 
+        //search based on changing text
         binding.searchView.editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
@@ -70,9 +74,8 @@ class MainActivity : AppCompatActivity() {
 
             @RequiresApi(Build.VERSION_CODES.O)
             override fun afterTextChanged(s: Editable) {
-                // filter your list from your input
+                // filter dataset from input
                 filter(s.toString())
-                //you can use runnable postDelayed like 500 ms to delay search text
             }
         })
 
@@ -85,23 +88,21 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //to filter dataset and perform search
     private fun filter(searchString:String) {
-        // creating a new array list to filter our data.
+        //creating a new list to filter dataset.
         val filteredList = mutableListOf<Product>()
 
-        // running a for loop to compare elements.
+        //running a loop to compare elements.
         for (item in dataset) {
-            // checking if the entered string matched with any item of our recycler view.
+            //checking if the entered string matched with any item of our recycler view.
             if (item.product_name!!.contains(searchString, true) || item.product_type!!.contains(searchString, true)) {
-                // if the item is matched we are
-                // adding it to our filtered list.
+                //if the item is matched we are add it to filtered list
                 filteredList.add(item)
             }
         }
+        // if no item is added in filtered list, show "No Product Found" TextView
         if (filteredList.isEmpty()) {
-            // if no item is added in filtered list we are
-            // displaying a toast message as no data found.
-//            Toast.makeText(this, "No Product Found", Toast.LENGTH_SHORT).show();
             binding.noSearch.visibility = VISIBLE
 
         } else {
@@ -109,6 +110,7 @@ class MainActivity : AppCompatActivity() {
 
         }
         Log.i("check", filteredList.toString())
+        //set new dataset
         adapter = ListingAdapter(applicationContext,filteredList)
         binding.recyclerView.adapter=adapter
     }
@@ -119,12 +121,14 @@ class MainActivity : AppCompatActivity() {
         val retrofitBuffer=Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
             .baseUrl(dataURL).build().create(ApiInterface::class.java)
 
+        //make an api call to get products list
         val retrofitData = retrofitBuffer.getProductInfo()
 
         retrofitData.enqueue(object : Callback<List<Product>?> {
             override fun onResponse(call: Call<List<Product>?>, response: Response<List<Product>?>) {
-                val responseBody=response.body()!!
+                val responseBody=response.body()!!      //returns a list of Products
                 dataset=responseBody.toMutableList()
+                //set recycler view
                 adapter = ListingAdapter(baseContext,dataset)
                 adapter.notifyDataSetChanged()
                 binding.progressBar.hide()
@@ -140,6 +144,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
     override fun onBackPressed() {
+        //if search bar is selected close it first when clicked on back button
         if (binding.searchView.isShowing) {
             binding.searchView.setText("")
             binding.searchView.hide()

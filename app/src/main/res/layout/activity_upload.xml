@@ -14,9 +14,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Product"
+            android:text="@string/add_product_header"
             android:textAppearance="?attr/textAppearanceTitleLarge"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
 
             />
@@ -24,8 +24,8 @@
             android:id="@+id/upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload"
-            android:layout_alignParentRight="true"
+            android:text="@string/upload_button_hint"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
 
             />
@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:hint="Product Name"
+        android:hint="@string/product_name_hint"
         >
 
         <com.google.android.material.textfield.TextInputEditText
@@ -68,14 +68,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:hint="Product Type">
+            android:hint="@string/product_type_hint">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/typeInput"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="16dp"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:inputType="textAutoComplete|textAutoCorrect"
                 android:imeOptions="actionNext"/>
 
@@ -87,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:hint="Price">
+            android:hint="@string/price_hint">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/priceInput"
@@ -102,7 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:hint="Tax Rate(%)">
+            android:hint="@string/tax_rate_hint">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/taxRateInput"
@@ -117,7 +117,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Add Image"
+        android:text="@string/add_image_button_text"
         app:icon="@drawable/baseline_upload_24"
         app:cornerRadius="4dp"
         />

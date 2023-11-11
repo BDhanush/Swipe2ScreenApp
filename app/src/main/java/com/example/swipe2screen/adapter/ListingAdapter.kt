@@ -9,13 +9,14 @@ import com.squareup.picasso.Picasso
 import java.text.NumberFormat
 import java.util.*
 
+//Adapter for RecyclerView to display list of products.
 class ListingAdapter(val context: Context, var dataset:MutableList<Product>): RecyclerView.Adapter<ListingAdapter.ItemViewHolder>()
 {
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var img:ImageView=view.findViewById(R.id.img)
-        var title:TextView=view.findViewById(R.id.title)
-        val type:TextView=view.findViewById(R.id.type)
-        val price:TextView?=view.findViewById(R.id.price)
+        var img:ImageView=view.findViewById(R.id.img)           //product image
+        var title:TextView=view.findViewById(R.id.title)        //product name
+        val type:TextView=view.findViewById(R.id.type)          //product type
+        val price:TextView?=view.findViewById(R.id.price)       //price of product calculated as price*(1+tax%)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -28,10 +29,9 @@ class ListingAdapter(val context: Context, var dataset:MutableList<Product>): Re
 
     fun filterList(filterlist: MutableList<Product>) {
         // below line is to add our filtered
-        // list in our course array list.
         dataset = filterlist
         // below line is to notify our adapter
-        // as change in recycler view data.
+        // as change in recycler view data
         notifyDataSetChanged()
     }
 
@@ -39,10 +39,13 @@ class ListingAdapter(val context: Context, var dataset:MutableList<Product>): Re
         val item = dataset[position]
 
         if(item.image!="")
-            Picasso.get().load(item.image).into(holder.img);
+            Picasso.get().load(item.image).into(holder.img);        //if product image exists load it using the link
+
+        //set other details
         holder.title.text= item.product_name
         holder.type.text= "Type: ${item.product_type}"
         val priceWithTax =item.price*(1+item.tax)
+        //set price with rupee symbol
         holder.price!!.text= NumberFormat.getCurrencyInstance(Locale("en","in")).format(priceWithTax)
     }
     override fun getItemCount() = dataset.size

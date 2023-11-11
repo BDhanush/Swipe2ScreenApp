@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Swipe2Screen"
         android:requestLegacyExternalStorage="true"
-        tools:targetApi="33">
+        tools:targetApi="34">
         <activity
             android:name=".UploadActivity"
             android:exported="false"

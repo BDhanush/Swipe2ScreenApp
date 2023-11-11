@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Swipe2Screen</string>
+    <string name="with_tax">with tax</string>
+    <string name="add_image_button_text">Add Image</string>
+    <string name="tax_rate_hint">Tax Rate(%)</string>
+    <string name="price_hint">Price</string>
+    <string name="product_type_hint">Product Type</string>
+    <string name="product_name_hint">Product Name</string>
+    <string name="upload_button_hint">Upload</string>
+    <string name="add_product_header">Add Product</string>
+    <string name="add_listing_description">add listing</string>
+    <string name="no_search_result_prompt">No Products found</string>
+    <string name="search_hint">Search</string>
 </resources>

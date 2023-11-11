@@ -10,10 +10,13 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
+//retrofit api service
 interface ApiInterface {
+    //a method to make an HTTP GET request to retrieve a list of products from the "get" endpoint
     @GET(value = "get")
     fun getProductInfo(): Call<List<Product>>
 
+    //a method for sending a multipart form data POST request to the "add" endpoint
     @Multipart
     @POST(value = "add")
     fun upload(

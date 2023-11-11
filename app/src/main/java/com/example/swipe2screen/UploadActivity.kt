@@ -34,10 +34,9 @@ import java.util.*
 class UploadActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUploadBinding
-    val postURL="https://app.getswipe.in/api/public/"
-    private val productTypes:ArrayList<String> = arrayListOf("OS","Service","MNC","Other","pen")
+    private val productTypes:ArrayList<String> = arrayListOf("OS","Service","MNC","Other","pen")        //array of selectable product types
     private val SELECT_PICTURE = 200;
-    private var selectedImageUri:Uri?=null;
+    private var selectedImageUri:Uri?=null;             //for a selectedImageUri
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -54,23 +53,23 @@ class UploadActivity : AppCompatActivity() {
         binding.typeInput.setOnFocusChangeListener { v, hasFocus ->
             if(hasFocus)
             {
-                binding.typeInput.showDropDown();
+                binding.typeInput.showDropDown();       //to display the selectable list of product types when the field gains focus
             }
         }
         binding.typeInput.setOnClickListener {
-            binding.typeInput.showDropDown();
+            binding.typeInput.showDropDown();           //to display the selectable list of product types on a click
         }
 
         binding.addImage.setOnClickListener{
-            chooseImage()
+            chooseImage()                               //select an image from the device storage
 
         }
 
         binding.upload.setOnClickListener {
-            if(checkAllFields())
+            if(checkAllFields())                        //form validation
             {
-                lockUploadButton()
-                upload()
+                lockUploadButton()                      //lock the upload button
+                upload()                                //initiate post to api endpoint
 
             }
         }
@@ -79,13 +78,13 @@ class UploadActivity : AppCompatActivity() {
 
     private fun lockUploadButton()
     {
-        binding.upload.isEnabled=false
-        binding.upload.text="Uploading"
+        binding.upload.isEnabled=false      //disable button
+        binding.upload.text="Uploading"     //and change text to Uploading
     }
     private fun unlockUploadButton()
     {
-        binding.upload.isEnabled=true
-        binding.upload.text="Upload"
+        binding.upload.isEnabled=true       //enable button
+        binding.upload.text="Upload"        //and change text to Upload
     }
     private fun upload(){
 
@@ -94,41 +93,44 @@ class UploadActivity : AppCompatActivity() {
 
 
         val filesDir=applicationContext.filesDir
-        val file=File(filesDir,"product_image.png")
+        val file=File(filesDir,"product_image.png")     //create a tempfile for image
         val outputStream=FileOutputStream(file)
 
         //add image via ImageView (1:1 ratio)
         val imageDrawable=binding.imagePreview.drawable as BitmapDrawable?
-        if(imageDrawable!=null) {
+        if(imageDrawable!=null) {                           //if image is selected, get a bitmap of it and put it in tempfile
             val bitmap = imageDrawable.bitmap
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         }
 
-        //add Image via Uri (no crop)
-//        val inputStream= selectedImageUri?.let { contentResolver.openInputStream(it) }
-//        inputStream?.copyTo(outputStream)
+//        //add Image via Uri (no crop)
+//        val inputStream= selectedImageUri?.let { contentResolver.openInputStream(it) }    //get input stream from selected image's uri
+//        inputStream?.copyTo(outputStream)                                                 //put it in tempfile
 
-        val requestBody = RequestBody.create(MediaType.parse("image/*"),file)
-        val filePart:MultipartBody.Part? = if(selectedImageUri!=null)
+        val requestBody = RequestBody.create(MediaType.parse("image/*"),file)         //request body for file
+        val filePart:MultipartBody.Part? = if(selectedImageUri!=null)                       //preparing a MultipartBody.Part for uploading the selected image file
                 MultipartBody.Part.createFormData("files[]", file.name,requestBody)
             else
                 null
 
+        //prepare all required parts (parameters for api endpoint)
         val pricePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.priceInput.text.toString())
         val taxPart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.taxRateInput.text.toString())
         val productNamePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.productNameInput.text.toString())
         val productTypePart = RequestBody.create(MediaType.parse("multipart/form-data"),binding.typeInput.text.toString())
 
+        //call the api endpoint (post/add) with parameter values
         val retrofitData = retrofitBuffer.upload(pricePart,productNamePart,productTypePart,taxPart,filePart)
 
-
+        //check response and act accordingly
         retrofitData.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
 //                val code=response.code()
 //                Toast.makeText(applicationContext,"$code",Toast.LENGTH_SHORT).show()
+                Log.e(TAG,response.toString())
                 if (response.isSuccessful) {
                     Toast.makeText(applicationContext,"Product added", Toast.LENGTH_SHORT).show()
-                    finish()
+                    finish()                    //close the activity if success
                     Intent(baseContext, MainActivity::class.java).also {
                         it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(it)
@@ -136,16 +138,15 @@ class UploadActivity : AppCompatActivity() {
                 } else {
                     Log.e(TAG, "Error: ${response.code()}, ${response.message()}")
                     Toast.makeText(applicationContext, "Error adding product", Toast.LENGTH_SHORT).show()
-                    unlockUploadButton()
+                    unlockUploadButton()        //unlock the upload button
                 }
 
-                Log.e(TAG,response.toString())
 
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(applicationContext,t.message?:"Error", Toast.LENGTH_SHORT).show()
-                unlockUploadButton()
+                unlockUploadButton()            //unlock the upload button
             }
         })
 
@@ -165,8 +166,9 @@ class UploadActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode== Activity.RESULT_OK && requestCode==SELECT_PICTURE)
         {
-            selectedImageUri = data!!.data
+            selectedImageUri = data!!.data          //Uri of the selected image from storage
 
+            //change information of screen based on if an image is selected
             if(selectedImageUri!=null)
             {
                 binding.addImage.text="Choose another image"
