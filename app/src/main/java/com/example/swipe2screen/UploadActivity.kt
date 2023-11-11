@@ -193,6 +193,9 @@ class UploadActivity : AppCompatActivity() {
 
     private fun checkAllFields(): Boolean {
         var check:Boolean=true;
+        binding.productNameInput.setText(binding.productNameInput.text.toString().trim())
+        binding.typeInput.setText(binding.typeInput.text.toString().trim())
+
         if (binding.productNameInput.length() == 0) {
             binding.productNameInput.error = "This field is required"
             check = false
