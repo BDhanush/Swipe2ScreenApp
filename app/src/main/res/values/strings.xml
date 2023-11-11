@@ -11,4 +11,8 @@
     <string name="add_listing_description">add listing</string>
     <string name="no_search_result_prompt">No Products found</string>
     <string name="search_hint">Search</string>
+    <string name="type_representation">Type: %s</string>
+    <string name="image_button_selected">Choose another image</string>
+    <string name="image_button_default">Add Image</string>
+
 </resources>

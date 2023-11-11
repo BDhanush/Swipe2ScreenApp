@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         binding.searchView.editText.setOnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
-            binding.searchBar.text = binding.searchView.text
+            binding.searchBar.setText(binding.searchView.text)
             binding.searchView.hide()
             false
         }
@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
         //if search bar is selected close it first when clicked on back button
-        if (binding.searchView.isShowing) {
+        if (binding.searchView.isShowing || binding.searchBar.text.isNotEmpty()) {
             binding.searchView.setText("")
             binding.searchView.hide()
             binding.searchBar.clearText()

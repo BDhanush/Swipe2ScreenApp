@@ -43,7 +43,7 @@ class ListingAdapter(val context: Context, var dataset:MutableList<Product>): Re
 
         //set other details
         holder.title.text= item.product_name
-        holder.type.text= "Type: ${item.product_type}"
+        holder.type.text= context.getString(R.string.type_representation,item.product_type)
         val priceWithTax =item.price*(1+item.tax)
         //set price with rupee symbol
         holder.price!!.text= NumberFormat.getCurrencyInstance(Locale("en","in")).format(priceWithTax)

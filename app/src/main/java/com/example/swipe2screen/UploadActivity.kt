@@ -8,6 +8,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -171,13 +173,16 @@ class UploadActivity : AppCompatActivity() {
             //change information of screen based on if an image is selected
             if(selectedImageUri!=null)
             {
-                binding.addImage.text="Choose another image"
+                binding.addImage.text=applicationContext.getString(R.string.image_button_selected)
                 binding.addImage.icon= ContextCompat.getDrawable(this, R.drawable.baseline_add_24)
                 binding.imagePreview.setImageURI(selectedImageUri)
+                binding.imagePreview.visibility=VISIBLE
             }else{
-                binding.addImage.text="Add Image"
+                binding.addImage.text=applicationContext.getString(R.string.image_button_default)
                 binding.addImage.icon= ContextCompat.getDrawable(this,R.drawable.baseline_upload_24)
                 binding.imagePreview.setImageDrawable(null)
+                binding.imagePreview.visibility=GONE
+
             }
 
         }
