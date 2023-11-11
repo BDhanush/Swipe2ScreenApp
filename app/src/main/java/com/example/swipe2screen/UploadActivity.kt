@@ -70,7 +70,6 @@ class UploadActivity : AppCompatActivity() {
         binding.upload.setOnClickListener {
             if(checkAllFields())                        //form validation
             {
-                lockUploadButton()                      //lock the upload button
                 upload()                                //initiate post to api endpoint
 
             }
@@ -89,6 +88,10 @@ class UploadActivity : AppCompatActivity() {
         binding.upload.text="Upload"        //and change text to Upload
     }
     private fun upload(){
+
+        lockUploadButton()                      //lock the upload button
+        Toast.makeText(applicationContext,"Uploading", Toast.LENGTH_SHORT).show()
+
 
         val retrofitBuffer= Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
             .baseUrl(dataURL).build().create(ApiInterface::class.java)
