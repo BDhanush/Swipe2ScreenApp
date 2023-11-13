@@ -25,9 +25,9 @@ class DetailsActivity : AppCompatActivity() {
             binding.type.text = extras.getString("productType")
             val price = intent.getDoubleExtra("price",0.0)
             var tax = intent.getDoubleExtra("tax",0.0)
-            tax/=100;
             val imageUrl = extras.getString("image")
-            val priceWithTax = price * (1 + tax)
+            val priceWithTax = price * (1 + tax/100)
+
             //represent price with tax
             binding.priceWithTax.text = applicationContext.getString(R.string.price_representation,price.toString(),tax.toString())
             //calculate price with tax
